@@ -1,4 +1,4 @@
-# `r-prime` - An async, multi-threaded framework based off of NASA's f-prime flight software framework
+# `r-prime` - An async, multi-threaded framework named in homage to NASA's flight software framework f-prime
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
 `r-prime` is developed and maintained by [UBC Bionics, Ltd.](https://ubcbionics.com/), a design team based in the University of British Columbia, Vancouver, Canada.
