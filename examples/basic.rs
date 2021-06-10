@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use async_framework::prelude::*;
+use r_prime::prelude::*;
 use tokio::time::sleep;
 
 async fn test1(_: Contacts<MS>) -> u32 {

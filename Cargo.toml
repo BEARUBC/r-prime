@@ -1,5 +1,5 @@
 [package]
-name = "async_framework"
+name = "r-prime"
 version = "0.1.0"
 authors = [
     "nathan-n-poon <nathannpoon@gmail.com>",
