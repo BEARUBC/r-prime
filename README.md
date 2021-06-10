@@ -18,6 +18,7 @@ As this framework matures, versions will be released to [crates.io](https://crat
 Add the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
-raestro = "0.3.0"
+r-prime = { path = "relative/path/to/r-prime" }
 ```
+Once again, since this framework has not been published yet, a local copy will need to be manually installed and linked.
 All examples of usage are provided in the `examples` folder.
