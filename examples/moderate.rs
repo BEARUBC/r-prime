@@ -27,7 +27,7 @@ struct MR;
 async fn handler1(_: Port<MS>, _: MS) -> MR { MR }
 async fn handler2(_: Port<MS>, _: MS) -> MR { MR }
 
-fn main() {
+fn main() -> ! {
     let mut cb1 = ComponentBuilder::new("c1", handler1).unwrap();
     let mut cb2 = ComponentBuilder::new("c2", handler2).unwrap();
 
@@ -36,7 +36,7 @@ fn main() {
         let rb = cb1.routine_builder();
         rb.push(Job::from_function(test1));
         rb.push(Job::from_function(test2));
-        rb.push(Job::from_spacer(1000u64));
+        rb.push(Job::from_spacer(2000u64));
     };
 
     // configuring cb2's routine
@@ -63,4 +63,8 @@ fn main() {
 
     sb.push(cb1);
     sb.push(cb2);
+
+    sb.build()
+        .unwrap()
+        .run()
 }

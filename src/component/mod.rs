@@ -1,15 +1,10 @@
 pub mod builder;
 pub mod error;
 
-use std::{
-    future::Future,
-    pin::Pin,
-    thread::{
+use std::{future::Future, pin::Pin, sync::Arc, thread::{
         self,
         JoinHandle,
-    },
-    time::Duration,
-};
+    }, time::Duration};
 
 use tokio::{
     runtime::Builder as TokioBuilder,
@@ -52,7 +47,7 @@ where
     // consumed by the while loop
     routine: Option<Routine<PSH>>,
     recver: Option<UnboundedReceiver<Request<PSH>>>,
-    handler: Option<Box<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send>>,
+    handler: Option<Arc<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send + Sync>>,
 }
 
 impl<PSH, PSR> Component<PSH, PSR>
@@ -66,7 +61,7 @@ where
         port_builder: PortBuilder<PSH>,
         routine_builder: RoutineBuilder<PSH>,
         recver: UnboundedReceiver<Request<PSH>>,
-        handler: Box<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send>,
+        handler: Arc<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send + Sync>,
     ) -> Self {
         Self {
             id,
@@ -85,9 +80,7 @@ where
     pub fn port(&self) -> &Port<PSH> { &self.port }
 
     pub fn start(&mut self) -> ComponentResult<JoinHandle<()>> {
-        if self.routine.is_some() {
-            // let (recver, handler) =
-            // self.port.partially_consume_data().unwrap();
+        if self.routine.is_some() && self.recver.is_some() && self.handler.is_some() {
             Ok((
                 self.port.clone(),
                 self.routine.take().unwrap(),
@@ -106,8 +99,15 @@ where
                         use Request::*;
 
                         match new_task {
-                            HandleMessage(msg) => {
-                                spawn_local(handler(port.clone(), msg));
+                            HandleMessage(message) => {
+                                // spawn_local(handler(port.clone(), message));
+                                let handler_copy = handler.clone();
+                                let port_clone = port.clone();
+
+                                spawn_local(async move {
+                                    #[allow(unused)]
+                                    let response = handler_copy(port_clone, message).await;
+                                });
                             },
                             RunJob => match routine.next() {
                                 Some(job) => {

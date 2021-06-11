@@ -1,8 +1,4 @@
-use std::{
-    borrow::Cow,
-    future::Future,
-    pin::Pin,
-};
+use std::{borrow::Cow, future::Future, pin::Pin, sync::Arc};
 
 use tokio::sync::mpsc::{
     unbounded_channel,
@@ -36,7 +32,7 @@ where
     port_builder: PortBuilder<PSH>,
     routine_builder: RoutineBuilder<PSH>,
     recver: UnboundedReceiver<Request<PSH>>,
-    handler: Box<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send>,
+    handler: Arc<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send + Sync>,
 }
 
 impl<PSH, PSR> ComponentBuilder<PSH, PSR>
@@ -57,7 +53,7 @@ where
                 port_builder: PortBuilder::new(sender),
                 routine_builder: RoutineBuilder::new(),
                 recver,
-                handler: Box::new(move |port, message| Box::pin(handler(port, message))),
+                handler: Arc::new(move |port, message| Box::pin(handler(port, message))),
             })
             .map_err(ComponentError::from)
     }

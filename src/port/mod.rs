@@ -39,7 +39,7 @@ impl<PSH> Port<PSH> {
 
     pub fn sender(&self) -> UnboundedSender<Request<PSH>> { self.sender.clone() }
 
-    pub fn send<'a, NM>(&self, name: NM, msg: PSH) -> PortResult<()>
+    pub fn send<'a, NM>(&self, name: NM, message: PSH) -> PortResult<()>
     where
         NM: Into<Cow<'a, str>>,
     {
@@ -51,7 +51,7 @@ impl<PSH> Port<PSH> {
             .ok_or(PortError::SenderDoesNotExist(owned_name))
             .and_then(|sender| {
                 sender
-                    .send(Request::HandleMessage(msg))
+                    .send(Request::HandleMessage(message))
                     .map_err(PortError::from)
             })
     }
