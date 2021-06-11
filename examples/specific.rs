@@ -22,7 +22,7 @@ enum SystemJob {
     MachineLearningAnalysis(MachineLearningAnalysis),
 }
 
-async fn get_battery_levels(_: Contacts<MS>) -> SystemJob {
+async fn get_battery_levels(_: Port<MS>) -> SystemJob {
     println!("getting battery percentage");
 
     // doing a bunch of GPIO interfacing
@@ -35,7 +35,7 @@ async fn get_battery_levels(_: Contacts<MS>) -> SystemJob {
     SystemJob::SensorsCheck(SensorsCheck::BatteryLevel(battery_levels))
 }
 
-async fn get_temperature_levels(_: Contacts<MS>) -> SystemJob {
+async fn get_temperature_levels(_: Port<MS>) -> SystemJob {
     println!("getting temperature levels");
 
     // doing a bunch of GPIO interfacing
@@ -48,7 +48,7 @@ async fn get_temperature_levels(_: Contacts<MS>) -> SystemJob {
     SystemJob::SensorsCheck(SensorsCheck::TemperatureLevel(temperature_levels))
 }
 
-async fn get_humidity_levels(_: Contacts<MS>) -> SystemJob {
+async fn get_humidity_levels(_: Port<MS>) -> u8 {
     println!("getting humidity levels");
 
     // doing a bunch of GPIO interfacing
@@ -58,10 +58,12 @@ async fn get_humidity_levels(_: Contacts<MS>) -> SystemJob {
     println!("got humidity levels");
     let humidity_levels = 101.101f64;
 
-    SystemJob::SensorsCheck(SensorsCheck::HumidityLevel(humidity_levels))
+    // SystemJob::SensorsCheck(SensorsCheck::
+    // HumidityLevel(humidity_levels))
+    0u8
 }
 
-async fn run_emg_analytics(_: Contacts<MS>) -> SystemJob {
+async fn run_emg_analytics(_: Port<MS>) -> SystemJob {
     println!("running emg analytics");
 
     // running a lot of Python
@@ -81,7 +83,7 @@ async fn run_emg_analytics(_: Contacts<MS>) -> SystemJob {
 #[derive(Clone)]
 struct MS;
 
-async fn handler(_: Contacts<MS>, _: MS) {}
+async fn handler(_: Port<MS>, _: MS) {}
 
 fn main() {
     // create all jobs
@@ -109,19 +111,25 @@ fn main() {
         rb
     };
 
-    let mut critical_component_builder =
-        ComponentBuilder::new("critical", critical_routine_builder, handler).unwrap();
+    // let mut critical_component_builder =
+    //     ComponentBuilder::new("critical",
+    // critical_routine_builder,
+    // handler).unwrap();
 
-    let mut user_component_builder =
-        ComponentBuilder::new("user", user_routine_builder, handler).unwrap();
+    // let mut user_component_builder =
+    //     ComponentBuilder::new("user",
+    // user_routine_builder, handler).unwrap();
 
-    // adding components to each others' contacts
-    critical_component_builder.add_component(&user_component_builder);
-    user_component_builder.add_component(&critical_component_builder);
+    // // adding components to each others'
+    // contacts critical_component_builder.
+    // add_component(&user_component_builder);
+    // user_component_builder.add_component(&
+    // critical_component_builder);
 
-    let mut sb = SystemBuilder::with_capacity(2usize);
-    sb.push(critical_component_builder);
-    sb.push(user_component_builder);
+    // let mut sb =
+    // SystemBuilder::with_capacity(2usize);
+    // sb.push(critical_component_builder);
+    // sb.push(user_component_builder);
 
-    sb.build().unwrap().run();
+    // sb.build().unwrap().run();
 }

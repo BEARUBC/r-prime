@@ -7,22 +7,24 @@ use std::fmt::{
 use tokio::sync::mpsc::error::SendError;
 
 #[derive(Debug, Clone)]
-pub enum ContactsError {
+pub enum PortError {
     SenderDoesNotExist(String),
     SendError,
+    PortNotConsumable,
 }
 
-impl Display for ContactsError {
+impl Display for PortError {
     fn fmt(&self, _: &mut Formatter) -> Result {
-        use ContactsError::*;
+        use PortError::*;
 
         match self {
             SenderDoesNotExist(_) => todo!(),
             SendError => todo!(),
+            PortNotConsumable => todo!(),
         }
     }
 }
 
-impl<T> From<SendError<T>> for ContactsError {
+impl<T> From<SendError<T>> for PortError {
     fn from(_: SendError<T>) -> Self { Self::SendError }
 }
