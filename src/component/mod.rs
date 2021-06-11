@@ -132,9 +132,7 @@ where
                                     use Job::*;
 
                                     match job.as_ref() {
-                                        Spacer(spacer) => {
-                                            sleep(Duration::from_millis(*spacer)).await
-                                        },
+                                        Spacer(spacer) => sleep(Duration::from_millis(*spacer)).await,
                                         Function(lambda) => {
                                             spawn_local(lambda(contacts.clone()));
                                         },
