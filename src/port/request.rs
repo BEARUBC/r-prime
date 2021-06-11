@@ -1,4 +1,4 @@
-pub enum Request<M> {
-    HandleMessage(M),
+pub enum Request<PSH> {
+    HandleMessage(PSH),
     RunJob,
 }
