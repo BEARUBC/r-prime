@@ -3,26 +3,28 @@ use std::{
     pin::Pin,
 };
 
-use crate::contacts::Contacts;
+use crate::port::Port;
 
-pub enum Job<M, R> {
+pub enum Job<PSH> {
     Spacer(u64),
-    Function(Box<dyn Fn(Contacts<M>) -> Pin<Box<dyn Future<Output = R>>>>),
+    Function(Box<dyn Fn(Port<PSH>) -> Pin<Box<dyn Future<Output = ()>>>>),
 }
 
-impl<M, R> Job<M, R> {
+impl<PSH> Job<PSH>
+where
+    PSH: 'static + Send,
+{
     pub fn from_spacer(amount: u64) -> Self { Self::Spacer(amount) }
 
-    pub fn from_function<Fut>(f: fn(Contacts<M>) -> Fut) -> Self
+    pub fn from_function<JRFut>(f: fn(Port<PSH>) -> JRFut) -> Self
     where
-        M: 'static,
-        Fut: 'static + Future<Output = R>,
+        JRFut: 'static + Future<Output = ()>,
     {
         Self::Function(Box::new(move |contacts| Box::pin(f(contacts))))
     }
 }
 
-impl<M, R> Clone for Job<M, R> {
+impl<PSH> Clone for Job<PSH> {
     fn clone(&self) -> Self {
         use Job::*;
 
@@ -33,6 +35,6 @@ impl<M, R> Clone for Job<M, R> {
     }
 }
 
-unsafe impl<M, R> Send for Job<M, R> {}
+unsafe impl<PSH> Send for Job<PSH> {}
 
-unsafe impl<M, R> Sync for Job<M, R> {}
+unsafe impl<PSH> Sync for Job<PSH> {}

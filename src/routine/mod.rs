@@ -8,14 +8,14 @@ use crate::{
     routine::builder::RoutineBuilder,
 };
 
-pub struct Routine<M, R> {
-    jobs: Box<[Arc<Job<M, R>>]>,
+pub struct Routine<PSH> {
+    jobs: Box<[Arc<Job<PSH>>]>,
     current_index: usize,
     max_capacity: usize,
 }
 
-impl<M, R> Routine<M, R> {
-    pub(crate) fn new(jobs: Vec<Arc<Job<M, R>>>) -> Self {
+impl<PSH> Routine<PSH> {
+    pub(crate) fn new(jobs: Vec<Arc<Job<PSH>>>) -> Self {
         let max_capacity = jobs.len();
 
         Self {
@@ -26,8 +26,8 @@ impl<M, R> Routine<M, R> {
     }
 }
 
-impl<M, R> Iterator for Routine<M, R> {
-    type Item = Arc<Job<M, R>>;
+impl<PSH> Iterator for Routine<PSH> {
+    type Item = Arc<Job<PSH>>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.max_capacity == 0usize {
@@ -52,8 +52,8 @@ impl<M, R> Iterator for Routine<M, R> {
     }
 }
 
-impl<M, R> From<RoutineBuilder<M, R>> for Routine<M, R> {
-    fn from(routine_builder: RoutineBuilder<M, R>) -> Self {
+impl<PSH> From<RoutineBuilder<PSH>> for Routine<PSH> {
+    fn from(routine_builder: RoutineBuilder<PSH>) -> Self {
         routine_builder.build().expect("unable to build routine")
     }
 }

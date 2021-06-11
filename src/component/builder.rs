@@ -1,102 +1,84 @@
-use std::{
-    borrow::Cow,
-    future::Future,
-    pin::Pin,
-};
+use std::{borrow::Cow, future::Future, pin::Pin, sync::Arc};
 
 use tokio::sync::mpsc::{
     unbounded_channel,
     UnboundedReceiver,
-    UnboundedSender,
 };
 
 use crate::{
     builder::Builder,
     component::{
         error::ComponentError,
-        request::Request,
         Component,
         ComponentResult,
         Identifier,
     },
-    contacts::{
-        builder::ContactsBuilder,
-        Contacts,
+    port::{
+        builder::PortBuilder,
+        request::Request,
     },
+    prelude::Port,
     routine::builder::RoutineBuilder,
     utils::get_new_id,
 };
 
-pub struct ComponentBuilder<M, R, A>
+pub struct ComponentBuilder<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
     id: Identifier,
     name: String,
-    sender: UnboundedSender<Request<M>>,
-    recver: UnboundedReceiver<Request<M>>,
-    routine_builder: RoutineBuilder<M, R>,
-    contacts_builder: ContactsBuilder<M>,
-    handler: Box<dyn Fn(Contacts<M>, M) -> Pin<Box<dyn Future<Output = A>>> + Send>,
+    port_builder: PortBuilder<PSH>,
+    routine_builder: RoutineBuilder<PSH>,
+    recver: UnboundedReceiver<Request<PSH>>,
+    handler: Arc<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send + Sync>,
 }
 
-impl<'a, M, R, A> ComponentBuilder<M, R, A>
+impl<PSH, PSR> ComponentBuilder<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
-    pub fn new<N, Fut>(
-        name: N,
-        routine_builder: RoutineBuilder<M, R>,
-        handler: fn(Contacts<M>, M) -> Fut,
-    ) -> ComponentResult<Self>
+    pub fn new<'a, N, PSFut>(name: N, handler: fn(Port<PSH>, PSH) -> PSFut) -> ComponentResult<Self>
     where
-        Fut: 'static + Future<Output = A>,
         N: Into<Cow<'a, str>>,
+        PSFut: 'static + Future<Output = PSR>,
     {
         get_new_id()
-            .map(|id| (id, unbounded_channel::<Request<M>>()))
-            .map(|(id, (send, recv))| Self {
+            .map(|id| (id, unbounded_channel()))
+            .map(|(id, (sender, recver))| Self {
                 id,
                 name: name.into().into_owned(),
-                sender: send,
-                recver: recv,
-                routine_builder,
-                contacts_builder: ContactsBuilder::new(),
-                handler: Box::new(move |contacts, message| Box::pin(handler(contacts, message))),
+                port_builder: PortBuilder::new(sender),
+                routine_builder: RoutineBuilder::new(),
+                recver,
+                handler: Arc::new(move |port, message| Box::pin(handler(port, message))),
             })
             .map_err(ComponentError::from)
     }
 
     pub fn id(&self) -> Identifier { self.id }
 
-    pub fn sender(&self) -> UnboundedSender<Request<M>> { self.sender.clone() }
-
     pub fn name(&self) -> &String { &self.name }
 
-    pub fn add_component(&mut self, component_builder: &Self) {
-        self.contacts_builder
-            .add_sender(component_builder.name().clone(), component_builder.sender())
-    }
+    pub fn port_builder(&mut self) -> &mut PortBuilder<PSH> { &mut self.port_builder }
+
+    pub fn routine_builder(&mut self) -> &mut RoutineBuilder<PSH> { &mut self.routine_builder }
 }
 
-impl<'a, M, R, A> Builder<Component<M, R, A>, ComponentError> for ComponentBuilder<M, R, A>
+impl<PSH, PSR> Builder<Component<PSH, PSR>, ComponentError> for ComponentBuilder<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
-    fn build(self) -> ComponentResult<Component<M, R, A>> {
+    fn build(self) -> ComponentResult<Component<PSH, PSR>> {
         Ok(Component::new(
             self.id,
             self.name,
-            self.sender,
-            self.recver,
-            self.contacts_builder,
+            self.port_builder,
             self.routine_builder,
+            self.recver,
             self.handler,
         ))
     }
