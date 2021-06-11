@@ -17,19 +17,17 @@ use crate::{
 
 pub type SystemResult<T> = Result<T, SystemError>;
 
-pub struct System<M, R, A>(Box<[Component<M, R, A>]>)
+pub struct System<PSH, PSR>(Box<[Component<PSH, PSR>]>)
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static;
+    PSH: 'static + Send,
+    PSR: 'static;
 
-impl<M, R, A> System<M, R, A>
+impl<PSH, PSR> System<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
-    pub(crate) fn new(component_builders: Vec<ComponentBuilder<M, R, A>>) -> Self {
+    pub(crate) fn new(component_builders: Vec<ComponentBuilder<PSH, PSR>>) -> Self {
         Self(
             component_builders
                 .into_iter()
@@ -50,7 +48,7 @@ where
             .block_on(async move {
                 loop {
                     for component in self.0.iter() {
-                        component.run_next_job().expect("unable to run job");
+                        component.port().run_next_job().expect("unable to run job");
                     }
                 }
             });
@@ -59,11 +57,10 @@ where
     }
 }
 
-impl<M, R, A> From<SystemBuilder<M, R, A>> for System<M, R, A>
+impl<PSH, PSR> From<SystemBuilder<PSH, PSR>> for System<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
-    fn from(system_builder: SystemBuilder<M, R, A>) -> Self { system_builder.build().unwrap() }
+    fn from(system_builder: SystemBuilder<PSH, PSR>) -> Self { system_builder.build().unwrap() }
 }

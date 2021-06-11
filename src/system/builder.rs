@@ -13,68 +13,61 @@ use crate::{
     },
 };
 
-pub struct SystemBuilder<M, R, A>(Vec<ComponentBuilder<M, R, A>>)
+pub struct SystemBuilder<PSH, PSR>(Vec<ComponentBuilder<PSH, PSR>>)
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static;
+    PSH: 'static + Send,
+    PSR: 'static;
 
-impl<'a, M, R, A> SystemBuilder<M, R, A>
+impl<PSH, PSR> SystemBuilder<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
     pub fn with_capacity(capacity: usize) -> Self { Self(Vec::with_capacity(capacity)) }
 
-    pub fn push(&mut self, component_builder: ComponentBuilder<M, R, A>) {
+    pub fn push(&mut self, component_builder: ComponentBuilder<PSH, PSR>) {
         self.0.push(component_builder)
     }
 }
 
-impl<'a, M, R, A> Builder<System<M, R, A>, SystemError> for SystemBuilder<M, R, A>
+impl<PSH, PSR> Builder<System<PSH, PSR>, SystemError> for SystemBuilder<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
-    fn build(self) -> SystemResult<System<M, R, A>> { Ok(System::new(self.0)) }
+    fn build(self) -> SystemResult<System<PSH, PSR>> { Ok(System::new(self.0)) }
 }
 
-impl<'a, M, R, A> Deref for SystemBuilder<M, R, A>
+impl<PSH, PSR> Deref for SystemBuilder<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
-    type Target = Vec<ComponentBuilder<M, R, A>>;
+    type Target = Vec<ComponentBuilder<PSH, PSR>>;
 
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 
-impl<'a, M, R, A> DerefMut for SystemBuilder<M, R, A>
+impl<PSH, PSR> DerefMut for SystemBuilder<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
-impl<'a, M, R, A> AsRef<Vec<ComponentBuilder<M, R, A>>> for SystemBuilder<M, R, A>
+impl<PSH, PSR> AsRef<Vec<ComponentBuilder<PSH, PSR>>> for SystemBuilder<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
-    fn as_ref(&self) -> &Vec<ComponentBuilder<M, R, A>> { &self.0 }
+    fn as_ref(&self) -> &Vec<ComponentBuilder<PSH, PSR>> { &self.0 }
 }
 
-impl<'a, M, R, A> AsMut<Vec<ComponentBuilder<M, R, A>>> for SystemBuilder<M, R, A>
+impl<PSH, PSR> AsMut<Vec<ComponentBuilder<PSH, PSR>>> for SystemBuilder<PSH, PSR>
 where
-    M: 'static + Send,
-    R: 'static,
-    A: 'static,
+    PSH: 'static + Send,
+    PSR: 'static,
 {
-    fn as_mut(&mut self) -> &mut Vec<ComponentBuilder<M, R, A>> { &mut self.0 }
+    fn as_mut(&mut self) -> &mut Vec<ComponentBuilder<PSH, PSR>> { &mut self.0 }
 }

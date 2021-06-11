@@ -12,32 +12,32 @@ use crate::{
     routine::Routine,
 };
 
-pub struct RoutineBuilder<M, R>(Vec<Arc<Job<M, R>>>);
+pub struct RoutineBuilder<PSH>(Vec<Arc<Job<PSH>>>);
 
-impl<M, R> RoutineBuilder<M, R> {
-    pub fn with_capacity(capacity: usize) -> Self { Self(Vec::with_capacity(capacity)) }
+impl<PSH> RoutineBuilder<PSH> {
+    pub fn new() -> Self { Self(Vec::new()) }
 
-    pub fn push(&mut self, job: Job<M, R>) { self.0.push(Arc::new(job)) }
+    pub fn push(&mut self, job: Job<PSH>) { self.0.push(Arc::new(job)) }
 }
 
-impl<M, R> Deref for RoutineBuilder<M, R> {
-    type Target = Vec<Arc<Job<M, R>>>;
+impl<PSH> Builder<Routine<PSH>, ()> for RoutineBuilder<PSH> {
+    fn build(self) -> Result<Routine<PSH>, ()> { Ok(Routine::new(self.0)) }
+}
+
+impl<PSH> Deref for RoutineBuilder<PSH> {
+    type Target = Vec<Arc<Job<PSH>>>;
 
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 
-impl<M, R> DerefMut for RoutineBuilder<M, R> {
+impl<PSH> DerefMut for RoutineBuilder<PSH> {
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
-impl<M, R> AsRef<Vec<Arc<Job<M, R>>>> for RoutineBuilder<M, R> {
-    fn as_ref(&self) -> &Vec<Arc<Job<M, R>>> { &self.0 }
+impl<PSH> AsRef<Vec<Arc<Job<PSH>>>> for RoutineBuilder<PSH> {
+    fn as_ref(&self) -> &Vec<Arc<Job<PSH>>> { &self.0 }
 }
 
-impl<M, R> AsMut<Vec<Arc<Job<M, R>>>> for RoutineBuilder<M, R> {
-    fn as_mut(&mut self) -> &mut Vec<Arc<Job<M, R>>> { &mut self.0 }
-}
-
-impl<M, R> Builder<Routine<M, R>, ()> for RoutineBuilder<M, R> {
-    fn build(self) -> Result<Routine<M, R>, ()> { Ok(Routine::new(self.0)) }
+impl<PSH> AsMut<Vec<Arc<Job<PSH>>>> for RoutineBuilder<PSH> {
+    fn as_mut(&mut self) -> &mut Vec<Arc<Job<PSH>>> { &mut self.0 }
 }
