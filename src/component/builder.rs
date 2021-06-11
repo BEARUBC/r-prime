@@ -1,4 +1,9 @@
-use std::{borrow::Cow, future::Future, pin::Pin, sync::Arc};
+use std::{
+    borrow::Cow,
+    future::Future,
+    pin::Pin,
+    sync::Arc,
+};
 
 use tokio::sync::mpsc::{
     unbounded_channel,

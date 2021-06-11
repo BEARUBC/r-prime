@@ -1,10 +1,16 @@
 pub mod builder;
 pub mod error;
 
-use std::{future::Future, pin::Pin, sync::Arc, thread::{
+use std::{
+    future::Future,
+    pin::Pin,
+    sync::Arc,
+    thread::{
         self,
         JoinHandle,
-    }, time::Duration};
+    },
+    time::Duration,
+};
 
 use tokio::{
     runtime::Builder as TokioBuilder,
@@ -47,7 +53,8 @@ where
     // consumed by the while loop
     routine: Option<Routine<PSH>>,
     recver: Option<UnboundedReceiver<Request<PSH>>>,
-    handler: Option<Arc<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send + Sync>>,
+    handler:
+        Option<Arc<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send + Sync>>,
 }
 
 impl<PSH, PSR> Component<PSH, PSR>

@@ -64,7 +64,5 @@ fn main() -> ! {
     sb.push(cb1);
     sb.push(cb2);
 
-    sb.build()
-        .unwrap()
-        .run()
+    sb.build().unwrap().run()
 }
