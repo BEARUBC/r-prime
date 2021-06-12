@@ -8,11 +8,19 @@
 use std::{
     future::Future,
     pin::Pin,
+    fmt::{
+        Display,
+        Debug,
+        Formatter,
+        Result,
+    },
 };
 
 use crate::port::Port;
 
-pub enum Job<PSH> {
+pub enum Job<PSH>
+where
+    PSH: 'static + Send, {
     Spacer(u64),
     Function(Box<dyn Fn(Port<PSH>) -> Pin<Box<dyn Future<Output = ()>>>>),
 }
@@ -31,7 +39,9 @@ where
     }
 }
 
-impl<PSH> Clone for Job<PSH> {
+impl<PSH> Clone for Job<PSH>
+where
+    PSH: 'static + Send, {
     fn clone(&self) -> Self {
         use Job::*;
 
@@ -42,6 +52,22 @@ impl<PSH> Clone for Job<PSH> {
     }
 }
 
-unsafe impl<PSH> Send for Job<PSH> {}
+impl<PSH> Display for Job<PSH>
+where
+    PSH: 'static + Send, {
+    fn fmt(&self, _: &mut Formatter) -> Result { todo!() }
+}
 
-unsafe impl<PSH> Sync for Job<PSH> {}
+impl<PSH> Debug for Job<PSH>
+where
+    PSH: 'static + Send, {
+    fn fmt(&self, _: &mut Formatter) -> Result { todo!() }
+}
+
+unsafe impl<PSH> Send for Job<PSH>
+where
+    PSH: 'static + Send, {}
+
+unsafe impl<PSH> Sync for Job<PSH>
+where
+    PSH: 'static + Send, {}

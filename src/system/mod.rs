@@ -8,6 +8,12 @@
 pub mod builder;
 pub mod error;
 
+use std::fmt::{
+    Display,
+    Formatter,
+    Result as StdFmtResult,
+};
+
 use tokio::runtime::Builder as TokioBuilder;
 
 use crate::{
@@ -70,4 +76,11 @@ where
     PSR: 'static,
 {
     fn from(system_builder: SystemBuilder<PSH, PSR>) -> Self { system_builder.build().unwrap() }
+}
+
+impl<PSH, PSR> Display for System<PSH, PSR>
+where
+PSH: 'static + Send,
+PSR: 'static, {
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

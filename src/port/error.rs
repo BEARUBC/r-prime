@@ -8,7 +8,7 @@
 use std::fmt::{
     Display,
     Formatter,
-    Result,
+    Result as StdFmtResult,
 };
 
 use tokio::sync::mpsc::error::SendError;
@@ -21,7 +21,7 @@ pub enum PortError {
 }
 
 impl Display for PortError {
-    fn fmt(&self, _: &mut Formatter) -> Result {
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult {
         use PortError::*;
 
         match self {

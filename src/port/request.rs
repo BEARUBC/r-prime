@@ -5,7 +5,22 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-pub enum Request<PSH> {
+use std::fmt::{
+    Display,
+    Formatter,
+    Result as StdFmtResult,
+};
+
+#[derive(Debug)]
+pub enum Request<PSH>
+where
+    PSH: 'static + Send, {
     HandleMessage(PSH),
     RunJob,
+}
+
+impl<PSH> Display for Request<PSH>
+where
+PSH: 'static + Send, {
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

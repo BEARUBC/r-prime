@@ -19,6 +19,12 @@ use std::{
         JoinHandle,
     },
     time::Duration,
+    fmt::{
+        Display,
+        Debug,
+        Formatter,
+        Result as StdFmtResult,
+    },
 };
 
 use tokio::{
@@ -165,4 +171,20 @@ where
             _ => panic!(),
         }
     }
+}
+
+impl<PSH, PSR> Display for Component<PSH, PSR>
+where
+    PSH: 'static + Send,
+    PSR: 'static,
+{
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
+}
+
+impl<PSH, PSR> Debug for Component<PSH, PSR>
+where
+    PSH: 'static + Send,
+    PSR: 'static,
+{
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

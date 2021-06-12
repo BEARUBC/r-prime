@@ -7,7 +7,14 @@
 
 pub mod builder;
 
-use std::sync::Arc;
+use std::{
+    sync::Arc,
+    fmt::{
+        Display,
+        Formatter,
+        Result as StdFmtResult,
+    },
+};
 
 use crate::{
     builder::Builder,
@@ -15,13 +22,18 @@ use crate::{
     routine::builder::RoutineBuilder,
 };
 
-pub struct Routine<PSH> {
+#[derive(Debug)]
+pub struct Routine<PSH>
+where
+    PSH: 'static + Send, {
     jobs: Box<[Arc<Job<PSH>>]>,
     start_index: usize,
     current_index: usize,
 }
 
-impl<PSH> Routine<PSH> {
+impl<PSH> Routine<PSH>
+where
+    PSH: 'static + Send, {
     pub(crate) fn new(jobs: Vec<Arc<Job<PSH>>>, start_index: usize) -> Self {
         Self {
             jobs: jobs.into_boxed_slice(),
@@ -31,7 +43,9 @@ impl<PSH> Routine<PSH> {
     }
 }
 
-impl<PSH> Iterator for Routine<PSH> {
+impl<PSH> Iterator for Routine<PSH>
+where
+    PSH: 'static + Send, {
     type Item = Arc<Job<PSH>>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -47,8 +61,16 @@ impl<PSH> Iterator for Routine<PSH> {
     }
 }
 
-impl<PSH> From<RoutineBuilder<PSH>> for Routine<PSH> {
+impl<PSH> From<RoutineBuilder<PSH>> for Routine<PSH>
+where
+    PSH: 'static + Send, {
     fn from(routine_builder: RoutineBuilder<PSH>) -> Self {
         routine_builder.build().expect("unable to build routine")
     }
+}
+
+impl<PSH> Display for Routine<PSH>
+where
+PSH: 'static + Send, {
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

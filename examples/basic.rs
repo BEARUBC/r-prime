@@ -28,6 +28,7 @@ async fn test2(_: Port<MS>) {
 enum MS {}
 
 // State Store
+#[derive(Debug)]
 struct Store;
 impl Store {
     fn update(&mut self, _: u8) {}

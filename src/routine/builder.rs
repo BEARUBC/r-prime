@@ -11,6 +11,11 @@ use std::{
         DerefMut,
     },
     sync::Arc,
+    fmt::{
+        Display,
+        Formatter,
+        Result as StdFmtResult,
+    }
 };
 
 use crate::{
@@ -19,12 +24,17 @@ use crate::{
     routine::Routine,
 };
 
-pub struct RoutineBuilder<PSH> {
+#[derive(Debug)]
+pub struct RoutineBuilder<PSH>
+where
+    PSH: 'static + Send, {
     jobs: Vec<Arc<Job<PSH>>>,
     start_index: usize,
 }
 
-impl<PSH> RoutineBuilder<PSH> {
+impl<PSH> RoutineBuilder<PSH>
+where
+    PSH: 'static + Send, {
     pub fn new() -> Self {
         Self {
             jobs: Vec::new(),
@@ -37,24 +47,40 @@ impl<PSH> RoutineBuilder<PSH> {
     pub fn set_start_index(&mut self, start_index: usize) { self.start_index = start_index }
 }
 
-impl<PSH> Builder<Routine<PSH>, ()> for RoutineBuilder<PSH> {
+impl<PSH> Builder<Routine<PSH>, ()> for RoutineBuilder<PSH>
+where
+    PSH: 'static + Send, {
     fn build(self) -> Result<Routine<PSH>, ()> { Ok(Routine::new(self.jobs, self.start_index)) }
 }
 
-impl<PSH> Deref for RoutineBuilder<PSH> {
+impl<PSH> Deref for RoutineBuilder<PSH>
+where
+    PSH: 'static + Send, {
     type Target = Vec<Arc<Job<PSH>>>;
 
     fn deref(&self) -> &Self::Target { &self.jobs }
 }
 
-impl<PSH> DerefMut for RoutineBuilder<PSH> {
+impl<PSH> DerefMut for RoutineBuilder<PSH>
+where
+    PSH: 'static + Send, {
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.jobs }
 }
 
-impl<PSH> AsRef<Vec<Arc<Job<PSH>>>> for RoutineBuilder<PSH> {
+impl<PSH> AsRef<Vec<Arc<Job<PSH>>>> for RoutineBuilder<PSH>
+where
+    PSH: 'static + Send, {
     fn as_ref(&self) -> &Vec<Arc<Job<PSH>>> { &self.jobs }
 }
 
-impl<PSH> AsMut<Vec<Arc<Job<PSH>>>> for RoutineBuilder<PSH> {
+impl<PSH> AsMut<Vec<Arc<Job<PSH>>>> for RoutineBuilder<PSH>
+where
+    PSH: 'static + Send, {
     fn as_mut(&mut self) -> &mut Vec<Arc<Job<PSH>>> { &mut self.jobs }
+}
+
+impl<PSH> Display for RoutineBuilder<PSH>
+where
+PSH: 'static + Send, {
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

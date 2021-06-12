@@ -10,6 +10,12 @@ use std::{
     future::Future,
     pin::Pin,
     sync::Arc,
+    fmt::{
+        Display,
+        Debug,
+        Formatter,
+        Result as StdFmtResult,
+    },
 };
 
 use tokio::sync::mpsc::{
@@ -102,4 +108,20 @@ where
             self.handler,
         ))
     }
+}
+
+impl<PSH, PSR> Display for ComponentBuilder<PSH, PSR>
+where
+    PSH: 'static + Send,
+    PSR: 'static,
+{
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
+}
+
+impl<PSH, PSR> Debug for ComponentBuilder<PSH, PSR>
+where
+    PSH: 'static + Send,
+    PSR: 'static,
+{
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

@@ -13,6 +13,11 @@ use std::{
     borrow::Cow,
     collections::BTreeMap,
     sync::Arc,
+    fmt::{
+        Display,
+        Formatter,
+        Result as StdFmtResult,
+    }
 };
 
 use tokio::sync::mpsc::UnboundedSender;
@@ -28,12 +33,17 @@ use crate::{
 
 pub type PortResult<T> = Result<T, PortError>;
 
-pub struct Port<PSH> {
+#[derive(Debug)]
+pub struct Port<PSH>
+where
+    PSH: 'static + Send, {
     sender: UnboundedSender<Request<PSH>>,
     others: Arc<BTreeMap<String, UnboundedSender<Request<PSH>>>>,
 }
 
-impl<PSH> Port<PSH> {
+impl<PSH> Port<PSH>
+where
+    PSH: 'static + Send, {
     pub(crate) fn new(
         sender: UnboundedSender<Request<PSH>>,
         others: BTreeMap<String, UnboundedSender<Request<PSH>>>,
@@ -68,7 +78,9 @@ impl<PSH> Port<PSH> {
     }
 }
 
-impl<PSH> Clone for Port<PSH> {
+impl<PSH> Clone for Port<PSH>
+where
+    PSH: 'static + Send, {
     fn clone(&self) -> Self {
         Self {
             sender: self.sender.clone(),
@@ -77,8 +89,17 @@ impl<PSH> Clone for Port<PSH> {
     }
 }
 
-impl<PSH> From<PortBuilder<PSH>> for Port<PSH> {
+impl<PSH> From<PortBuilder<PSH>> for Port<PSH>
+where
+    PSH: 'static + Send, {
     fn from(contacts_builder: PortBuilder<PSH>) -> Self {
         contacts_builder.build().expect("unable to build contacts")
     }
+}
+
+impl<PSH> Display for Port<PSH>
+where
+    PSH: 'static + Send,
+{
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

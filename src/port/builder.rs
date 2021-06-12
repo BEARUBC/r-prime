@@ -5,7 +5,15 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-use std::collections::BTreeMap;
+use std::{
+    collections::BTreeMap,
+    fmt::{
+        Display,
+        Formatter,
+        Debug,
+        Result as StdFmtResult,
+    }
+};
 
 use tokio::sync::mpsc::UnboundedSender;
 
@@ -20,7 +28,10 @@ use crate::{
     prelude::ComponentBuilder,
 };
 
-pub struct PortBuilder<PSH> {
+#[derive(Debug)]
+pub struct PortBuilder<PSH>
+where
+    PSH: 'static + Send, {
     sender: UnboundedSender<Request<PSH>>,
     others: BTreeMap<String, UnboundedSender<Request<PSH>>>,
 }
@@ -46,6 +57,15 @@ where
     }
 }
 
-impl<PSH> Builder<Port<PSH>, PortError> for PortBuilder<PSH> {
+impl<PSH> Builder<Port<PSH>, PortError> for PortBuilder<PSH>
+where
+    PSH: 'static + Send, {
     fn build(self) -> PortResult<Port<PSH>> { Ok(Port::new(self.sender, self.others)) }
+}
+
+impl<PSH> Display for PortBuilder<PSH>
+where
+    PSH: 'static + Send,
+{
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

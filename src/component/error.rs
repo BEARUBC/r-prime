@@ -8,7 +8,7 @@
 use std::fmt::{
     Display,
     Formatter,
-    Result,
+    Result as StdFmtResult,
 };
 
 use tokio::sync::mpsc::error::SendError;
@@ -27,7 +27,7 @@ pub enum ComponentError {
 }
 
 impl Display for ComponentError {
-    fn fmt(&self, _: &mut Formatter) -> Result {
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult {
         use ComponentError::*;
 
         match self {
