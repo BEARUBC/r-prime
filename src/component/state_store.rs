@@ -5,6 +5,6 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-pub trait Builder<SUC, ERR> {
-    fn build(self) -> Result<SUC, ERR>;
-}
+use std::any::Any;
+
+pub trait StateStore: Any {}

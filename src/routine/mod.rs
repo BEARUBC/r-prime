@@ -1,3 +1,10 @@
+// Copyright 2021 UBC Bionics, Ltd.
+//
+// Licensed under the MIT license
+// <LICENSE.md or https://opensource.org/licenses/MIT>.
+// This file may not be copied, modified, or
+// distributed except according to those terms.
+
 pub mod builder;
 
 use std::sync::Arc;
@@ -10,18 +17,16 @@ use crate::{
 
 pub struct Routine<PSH> {
     jobs: Box<[Arc<Job<PSH>>]>,
+    start_index: usize,
     current_index: usize,
-    max_capacity: usize,
 }
 
 impl<PSH> Routine<PSH> {
-    pub(crate) fn new(jobs: Vec<Arc<Job<PSH>>>) -> Self {
-        let max_capacity = jobs.len();
-
+    pub(crate) fn new(jobs: Vec<Arc<Job<PSH>>>, start_index: usize) -> Self {
         Self {
             jobs: jobs.into_boxed_slice(),
+            start_index,
             current_index: 0usize,
-            max_capacity,
         }
     }
 }
@@ -30,25 +35,15 @@ impl<PSH> Iterator for Routine<PSH> {
     type Item = Arc<Job<PSH>>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.max_capacity == 0usize {
-            None
-        } else {
-            Some(
-                self.jobs
-                    .get(self.current_index)
-                    .unwrap() // unwrap should never fail
-                    .clone(),
-            )
-        }
-        .map(|item| {
-            self.current_index = if self.current_index == (self.max_capacity - 1usize) {
-                0usize
-            } else {
-                self.current_index + 1usize
-            };
+        match self.jobs.get(self.current_index) {
+            Some(job) => {
+                if self.current_index == (self.jobs.len() - 1usize) { self.current_index = self.start_index }
+                else { self.current_index += 1usize }
 
-            item
-        })
+                Some(job.clone())
+            },
+            None => None,
+        }
     }
 }
 

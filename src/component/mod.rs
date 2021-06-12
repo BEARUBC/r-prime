@@ -1,10 +1,25 @@
+// Copyright 2021 UBC Bionics, Ltd.
+//
+// Licensed under the MIT license
+// <LICENSE.md or https://opensource.org/licenses/MIT>.
+// This file may not be copied, modified, or
+// distributed except according to those terms.
+
 pub mod builder;
 pub mod error;
+pub mod state_store;
 
-use std::{future::Future, pin::Pin, sync::Arc, thread::{
+use std::{
+    any::Any,
+    future::Future,
+    pin::Pin,
+    sync::Arc,
+    thread::{
         self,
         JoinHandle,
-    }, time::Duration};
+    },
+    time::Duration,
+};
 
 use tokio::{
     runtime::Builder as TokioBuilder,
@@ -18,7 +33,10 @@ use tokio::{
 
 use crate::{
     builder::Builder,
-    component::error::ComponentError,
+    component::{
+        error::ComponentError,
+        state_store::StateStore,
+    },
     job::Job,
     port::{
         builder::PortBuilder,
@@ -43,11 +61,14 @@ where
     id: Identifier,
     name: String,
     port: Port<PSH>,
+    state_store: Box<dyn StateStore>,
 
-    // consumed by the while loop
-    routine: Option<Routine<PSH>>,
-    recver: Option<UnboundedReceiver<Request<PSH>>>,
-    handler: Option<Arc<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send + Sync>>,
+    // consumed data
+    consumable_data: Option<(
+        Routine<PSH>,
+        UnboundedReceiver<Request<PSH>>,
+        Arc<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send + Sync>,
+    )>,
 }
 
 impl<PSH, PSR> Component<PSH, PSR>
@@ -59,6 +80,7 @@ where
         id: Identifier,
         name: String,
         port_builder: PortBuilder<PSH>,
+        state_store: Box<dyn StateStore>,
         routine_builder: RoutineBuilder<PSH>,
         recver: UnboundedReceiver<Request<PSH>>,
         handler: Arc<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send + Sync>,
@@ -67,9 +89,8 @@ where
             id,
             name,
             port: port_builder.into(),
-            routine: Some(routine_builder.build().unwrap()),
-            recver: Some(recver),
-            handler: Some(handler),
+            state_store,
+            consumable_data: Some((routine_builder.build().unwrap(), recver, handler)),
         }
     }
 
@@ -80,17 +101,12 @@ where
     pub fn port(&self) -> &Port<PSH> { &self.port }
 
     pub fn start(&mut self) -> ComponentResult<JoinHandle<()>> {
-        if self.routine.is_some() && self.recver.is_some() && self.handler.is_some() {
-            Ok((
-                self.port.clone(),
-                self.routine.take().unwrap(),
-                self.recver.take().unwrap(),
-                self.handler.take().unwrap(),
-            ))
+        if self.consumable_data.is_some() {
+            Ok((self.port.clone(), self.consumable_data.take().unwrap()))
         } else {
             Err(ComponentError::AlreadyInitializedComponent)
         }
-        .map(|(port, mut routine, mut recver, handler)| {
+        .map(|(port, (mut routine, mut recver, handler))| {
             thread::spawn(move || {
                 let local = LocalSet::new();
 
@@ -135,5 +151,18 @@ where
                     .block_on(local);
             })
         })
+    }
+
+    // CSS stands for ConcreteStateStore
+    pub fn state_store<CSS>(&mut self) -> &mut CSS
+    where
+        CSS: StateStore,
+    {
+        let concrete_state_store = &mut self.state_store as &mut dyn Any;
+
+        match concrete_state_store.downcast_mut::<CSS>() {
+            Some(css) => css,
+            _ => panic!(),
+        }
     }
 }

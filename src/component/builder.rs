@@ -1,4 +1,16 @@
-use std::{borrow::Cow, future::Future, pin::Pin, sync::Arc};
+// Copyright 2021 UBC Bionics, Ltd.
+//
+// Licensed under the MIT license
+// <LICENSE.md or https://opensource.org/licenses/MIT>.
+// This file may not be copied, modified, or
+// distributed except according to those terms.
+
+use std::{
+    borrow::Cow,
+    future::Future,
+    pin::Pin,
+    sync::Arc,
+};
 
 use tokio::sync::mpsc::{
     unbounded_channel,
@@ -9,6 +21,7 @@ use crate::{
     builder::Builder,
     component::{
         error::ComponentError,
+        state_store::StateStore,
         Component,
         ComponentResult,
         Identifier,
@@ -30,6 +43,7 @@ where
     id: Identifier,
     name: String,
     port_builder: PortBuilder<PSH>,
+    state_store: Box<dyn StateStore>,
     routine_builder: RoutineBuilder<PSH>,
     recver: UnboundedReceiver<Request<PSH>>,
     handler: Arc<dyn Fn(Port<PSH>, PSH) -> Pin<Box<dyn Future<Output = PSR>>> + Send + Sync>,
@@ -40,7 +54,11 @@ where
     PSH: 'static + Send,
     PSR: 'static,
 {
-    pub fn new<'a, N, PSFut>(name: N, handler: fn(Port<PSH>, PSH) -> PSFut) -> ComponentResult<Self>
+    pub fn new<'a, N, PSFut>(
+        name: N,
+        state_store: Box<dyn StateStore>,
+        handler: fn(Port<PSH>, PSH) -> PSFut,
+    ) -> ComponentResult<Self>
     where
         N: Into<Cow<'a, str>>,
         PSFut: 'static + Future<Output = PSR>,
@@ -51,6 +69,7 @@ where
                 id,
                 name: name.into().into_owned(),
                 port_builder: PortBuilder::new(sender),
+                state_store,
                 routine_builder: RoutineBuilder::new(),
                 recver,
                 handler: Arc::new(move |port, message| Box::pin(handler(port, message))),
@@ -77,6 +96,7 @@ where
             self.id,
             self.name,
             self.port_builder,
+            self.state_store,
             self.routine_builder,
             self.recver,
             self.handler,
