@@ -8,33 +8,28 @@
 use std::fmt::{
     Display,
     Formatter,
-    Result,
+    Result as StdFmtResult,
 };
 
 use tokio::sync::mpsc::error::SendError;
 
-use crate::{
-    component::Identifier,
-    utils::MutexError,
-};
+use crate::utils::MutexError;
 
 #[derive(Debug, Clone)]
 pub enum ComponentError {
     AlreadyInitializedComponent,
     SendError,
     IdError,
-    ContactDoesNotExist(Identifier),
 }
 
 impl Display for ComponentError {
-    fn fmt(&self, _: &mut Formatter) -> Result {
+    fn fmt(&self, f: &mut Formatter) -> StdFmtResult {
         use ComponentError::*;
 
         match self {
-            AlreadyInitializedComponent => todo!(),
-            SendError => todo!(),
-            IdError => todo!(),
-            ContactDoesNotExist(_) => todo!(),
+            AlreadyInitializedComponent => write!(f, "Component is already initialized"),
+            SendError => write!(f, "Unable to send message"),
+            IdError => write!(f, "Unable to construct an id for this component"),
         }
     }
 }
