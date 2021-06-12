@@ -7,15 +7,15 @@
 
 use std::{
     borrow::Cow,
-    future::Future,
-    pin::Pin,
-    sync::Arc,
     fmt::{
-        Display,
         Debug,
+        Display,
         Formatter,
         Result as StdFmtResult,
     },
+    future::Future,
+    pin::Pin,
+    sync::Arc,
 };
 
 use tokio::sync::mpsc::{

@@ -17,17 +17,19 @@ use tokio::sync::mpsc::error::SendError;
 pub enum PortError {
     SenderDoesNotExist(String),
     SendError,
-    PortNotConsumable,
 }
 
 impl Display for PortError {
-    fn fmt(&self, _: &mut Formatter) -> StdFmtResult {
+    fn fmt(&self, f: &mut Formatter) -> StdFmtResult {
         use PortError::*;
 
         match self {
-            SenderDoesNotExist(_) => todo!(),
-            SendError => todo!(),
-            PortNotConsumable => todo!(),
+            SenderDoesNotExist(name) => write!(
+                f,
+                "Port belonging to component with name {} was not found",
+                name
+            ),
+            SendError => write!(f, "Unable to send to this port"),
         }
     }
 }

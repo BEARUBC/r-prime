@@ -6,7 +6,6 @@
 // distributed except according to those terms.
 
 pub mod builder;
-pub mod error;
 
 use std::fmt::{
     Display,
@@ -22,13 +21,10 @@ use crate::{
         builder::ComponentBuilder,
         Component,
     },
-    system::{
-        builder::SystemBuilder,
-        error::SystemError,
-    },
+    system::builder::SystemBuilder,
 };
 
-pub type SystemResult<T> = Result<T, SystemError>;
+pub type SystemResult<T> = Result<T, ()>;
 
 pub struct System<PSH, PSR>(Box<[Component<PSH, PSR>]>)
 where
@@ -80,7 +76,8 @@ where
 
 impl<PSH, PSR> Display for System<PSH, PSR>
 where
-PSH: 'static + Send,
-PSR: 'static, {
+    PSH: 'static + Send,
+    PSR: 'static,
+{
     fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

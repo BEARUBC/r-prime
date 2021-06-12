@@ -14,13 +14,15 @@ use std::fmt::{
 #[derive(Debug)]
 pub enum Request<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     HandleMessage(PSH),
     RunJob,
 }
 
 impl<PSH> Display for Request<PSH>
 where
-PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

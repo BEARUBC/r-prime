@@ -11,6 +11,12 @@ pub mod state_store;
 
 use std::{
     any::Any,
+    fmt::{
+        Debug,
+        Display,
+        Formatter,
+        Result as StdFmtResult,
+    },
     future::Future,
     pin::Pin,
     sync::Arc,
@@ -19,12 +25,6 @@ use std::{
         JoinHandle,
     },
     time::Duration,
-    fmt::{
-        Display,
-        Debug,
-        Formatter,
-        Result as StdFmtResult,
-    },
 };
 
 use tokio::{

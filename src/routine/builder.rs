@@ -6,16 +6,16 @@
 // distributed except according to those terms.
 
 use std::{
+    fmt::{
+        Display,
+        Formatter,
+        Result as StdFmtResult,
+    },
     ops::{
         Deref,
         DerefMut,
     },
     sync::Arc,
-    fmt::{
-        Display,
-        Formatter,
-        Result as StdFmtResult,
-    }
 };
 
 use crate::{
@@ -27,14 +27,16 @@ use crate::{
 #[derive(Debug)]
 pub struct RoutineBuilder<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     jobs: Vec<Arc<Job<PSH>>>,
     start_index: usize,
 }
 
 impl<PSH> RoutineBuilder<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     pub fn new() -> Self {
         Self {
             jobs: Vec::new(),
@@ -49,13 +51,15 @@ where
 
 impl<PSH> Builder<Routine<PSH>, ()> for RoutineBuilder<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     fn build(self) -> Result<Routine<PSH>, ()> { Ok(Routine::new(self.jobs, self.start_index)) }
 }
 
 impl<PSH> Deref for RoutineBuilder<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     type Target = Vec<Arc<Job<PSH>>>;
 
     fn deref(&self) -> &Self::Target { &self.jobs }
@@ -63,24 +67,28 @@ where
 
 impl<PSH> DerefMut for RoutineBuilder<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.jobs }
 }
 
 impl<PSH> AsRef<Vec<Arc<Job<PSH>>>> for RoutineBuilder<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     fn as_ref(&self) -> &Vec<Arc<Job<PSH>>> { &self.jobs }
 }
 
 impl<PSH> AsMut<Vec<Arc<Job<PSH>>>> for RoutineBuilder<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     fn as_mut(&mut self) -> &mut Vec<Arc<Job<PSH>>> { &mut self.jobs }
 }
 
 impl<PSH> Display for RoutineBuilder<PSH>
 where
-PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

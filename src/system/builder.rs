@@ -6,22 +6,21 @@
 // distributed except according to those terms.
 
 use std::{
-    ops::{
-        Deref,
-        DerefMut,
-    },
     fmt::{
         Display,
         Formatter,
         Result as StdFmtResult,
-    }
+    },
+    ops::{
+        Deref,
+        DerefMut,
+    },
 };
 
 use crate::{
     builder::Builder,
     component::builder::ComponentBuilder,
     system::{
-        error::SystemError,
         System,
         SystemResult,
     },
@@ -45,7 +44,7 @@ where
     }
 }
 
-impl<PSH, PSR> Builder<System<PSH, PSR>, SystemError> for SystemBuilder<PSH, PSR>
+impl<PSH, PSR> Builder<System<PSH, PSR>, ()> for SystemBuilder<PSH, PSR>
 where
     PSH: 'static + Send,
     PSR: 'static,
@@ -89,7 +88,8 @@ where
 
 impl<PSH, PSR> Display for SystemBuilder<PSH, PSR>
 where
-PSH: 'static + Send,
-PSR: 'static, {
+    PSH: 'static + Send,
+    PSR: 'static,
+{
     fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

@@ -8,11 +8,11 @@
 use std::{
     collections::BTreeMap,
     fmt::{
+        Debug,
         Display,
         Formatter,
-        Debug,
         Result as StdFmtResult,
-    }
+    },
 };
 
 use tokio::sync::mpsc::UnboundedSender;
@@ -31,7 +31,8 @@ use crate::{
 #[derive(Debug)]
 pub struct PortBuilder<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     sender: UnboundedSender<Request<PSH>>,
     others: BTreeMap<String, UnboundedSender<Request<PSH>>>,
 }
@@ -59,7 +60,8 @@ where
 
 impl<PSH> Builder<Port<PSH>, PortError> for PortBuilder<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     fn build(self) -> PortResult<Port<PSH>> { Ok(Port::new(self.sender, self.others)) }
 }
 

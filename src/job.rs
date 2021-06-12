@@ -6,21 +6,22 @@
 // distributed except according to those terms.
 
 use std::{
-    future::Future,
-    pin::Pin,
     fmt::{
-        Display,
         Debug,
+        Display,
         Formatter,
         Result,
     },
+    future::Future,
+    pin::Pin,
 };
 
 use crate::port::Port;
 
 pub enum Job<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     Spacer(u64),
     Function(Box<dyn Fn(Port<PSH>) -> Pin<Box<dyn Future<Output = ()>>>>),
 }
@@ -41,7 +42,8 @@ where
 
 impl<PSH> Clone for Job<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     fn clone(&self) -> Self {
         use Job::*;
 
@@ -54,20 +56,18 @@ where
 
 impl<PSH> Display for Job<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     fn fmt(&self, _: &mut Formatter) -> Result { todo!() }
 }
 
 impl<PSH> Debug for Job<PSH>
 where
-    PSH: 'static + Send, {
+    PSH: 'static + Send,
+{
     fn fmt(&self, _: &mut Formatter) -> Result { todo!() }
 }
 
-unsafe impl<PSH> Send for Job<PSH>
-where
-    PSH: 'static + Send, {}
+unsafe impl<PSH> Send for Job<PSH> where PSH: 'static + Send {}
 
-unsafe impl<PSH> Sync for Job<PSH>
-where
-    PSH: 'static + Send, {}
+unsafe impl<PSH> Sync for Job<PSH> where PSH: 'static + Send {}
