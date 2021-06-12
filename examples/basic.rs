@@ -23,7 +23,7 @@ enum MS {}
 // State Store
 struct Store;
 impl Store {
-    fn update(&mut self, id: u8) {}
+    fn update(&mut self, _: u8) {}
 }
 impl StateStore for Store {}
 
