@@ -5,6 +5,9 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-use std::any::Any;
+use std::{
+    any::Any,
+    fmt::Debug,
+};
 
-pub trait StateStore: Any {}
+pub trait StateStore: Any + Debug {}

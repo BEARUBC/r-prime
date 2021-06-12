@@ -37,9 +37,11 @@ struct MR;
 async fn handler1(_: Port<MS>, _: MS) -> MR { MR }
 async fn handler2(_: Port<MS>, _: MS) -> MR { MR }
 
+#[derive(Debug)]
 struct Store1;
 impl StateStore for Store1 {}
 
+#[derive(Debug)]
 struct Store2;
 impl StateStore for Store2 {}
 

@@ -11,6 +11,12 @@ pub mod state_store;
 
 use std::{
     any::Any,
+    fmt::{
+        Debug,
+        Display,
+        Formatter,
+        Result as StdFmtResult,
+    },
     future::Future,
     pin::Pin,
     sync::Arc,
@@ -165,4 +171,20 @@ where
             _ => panic!(),
         }
     }
+}
+
+impl<PSH, PSR> Display for Component<PSH, PSR>
+where
+    PSH: 'static + Send,
+    PSR: 'static,
+{
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
+}
+
+impl<PSH, PSR> Debug for Component<PSH, PSR>
+where
+    PSH: 'static + Send,
+    PSR: 'static,
+{
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }

@@ -5,21 +5,28 @@
 // This file may not be copied, modified, or
 // distributed except according to those terms.
 
-use std::ops::{
-    Deref,
-    DerefMut,
+use std::{
+    fmt::{
+        Display,
+        Formatter,
+        Result as StdFmtResult,
+    },
+    ops::{
+        Deref,
+        DerefMut,
+    },
 };
 
 use crate::{
     builder::Builder,
     component::builder::ComponentBuilder,
     system::{
-        error::SystemError,
         System,
         SystemResult,
     },
 };
 
+#[derive(Debug)]
 pub struct SystemBuilder<PSH, PSR>(Vec<ComponentBuilder<PSH, PSR>>)
 where
     PSH: 'static + Send,
@@ -37,7 +44,7 @@ where
     }
 }
 
-impl<PSH, PSR> Builder<System<PSH, PSR>, SystemError> for SystemBuilder<PSH, PSR>
+impl<PSH, PSR> Builder<System<PSH, PSR>, ()> for SystemBuilder<PSH, PSR>
 where
     PSH: 'static + Send,
     PSR: 'static,
@@ -77,4 +84,12 @@ where
     PSR: 'static,
 {
     fn as_mut(&mut self) -> &mut Vec<ComponentBuilder<PSH, PSR>> { &mut self.0 }
+}
+
+impl<PSH, PSR> Display for SystemBuilder<PSH, PSR>
+where
+    PSH: 'static + Send,
+    PSR: 'static,
+{
+    fn fmt(&self, _: &mut Formatter) -> StdFmtResult { todo!() }
 }
