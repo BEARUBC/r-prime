@@ -1,6 +1,9 @@
 use std::time::Duration;
 
-use r_prime::prelude::*;
+use r_prime::{
+    component::state_store::StateStore,
+    prelude::*,
+};
 use tokio::time::sleep;
 
 async fn test1(_: Port<MS>) {
@@ -27,9 +30,15 @@ struct MR;
 async fn handler1(_: Port<MS>, _: MS) -> MR { MR }
 async fn handler2(_: Port<MS>, _: MS) -> MR { MR }
 
+struct Store1;
+impl StateStore for Store1 {}
+
+struct Store2;
+impl StateStore for Store2 {}
+
 fn main() -> ! {
-    let mut cb1 = ComponentBuilder::new("c1", handler1).unwrap();
-    let mut cb2 = ComponentBuilder::new("c2", handler2).unwrap();
+    let mut cb1 = ComponentBuilder::new("c1", Box::new(Store1), handler1).unwrap();
+    let mut cb2 = ComponentBuilder::new("c2", Box::new(Store2), handler2).unwrap();
 
     // configuring cb1's routine
     {
