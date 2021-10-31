@@ -34,7 +34,7 @@ where
     fn start(self, txs: Con) -> super::DriverableResult<Er> {
         let runtime = Runtime::new()?;
         let join_handle =
-            thread::spawn(move || runtime.block_on((self.f)(txs, self.rx.expect("Driver::init must be called first"))));
+            thread::spawn(move || runtime.block_on((self.f)(txs, self.rx.expect("Driven::init must be called first"))));
 
         Ok(join_handle)
     }

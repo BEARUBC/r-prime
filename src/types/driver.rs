@@ -6,8 +6,8 @@ use tokio::runtime::Runtime;
 use crate::types::Componentable;
 use crate::types::DriverFn;
 
-pub struct Driver<C, F> {
-    f: DriverFn<C, F>,
+pub struct Driver<Con, Fut> {
+    f: DriverFn<Con, Fut>,
 }
 
 impl<Con, Fut, Er> Componentable for Driver<Con, Fut>
