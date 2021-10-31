@@ -1,29 +1,26 @@
-// Copyright 2021 UBC Bionics, Ltd.
-//
-// Licensed under the MIT license
-// <LICENSE.md or https://opensource.org/licenses/MIT>.
-// This file may not be copied, modified, or
-// distributed except according to those terms.
+use std::future::Future;
+use std::time::Duration;
 
-use std::sync::{
-    Mutex,
-    MutexGuard,
-    PoisonError,
-};
+use tokio::sync::oneshot;
+use tokio::task::spawn;
+use tokio::time::sleep as tokio_sleep;
 
-use crate::component::Identifier;
+pub type Response<T> = oneshot::Sender<T>;
 
-pub(crate) type MutexError<'a> = PoisonError<MutexGuard<'a, Identifier>>;
-
-lazy_static! {
-    static ref ID_STORE: Mutex<usize> = Mutex::new(0usize);
+pub async fn sleep(millis: u64) {
+    tokio_sleep(Duration::from_millis(millis)).await
 }
 
-pub(crate) fn get_new_id<'a>() -> Result<usize, MutexError<'a>> {
-    ID_STORE.lock().map(|mut ref_id| {
-        let id = *ref_id;
-        *ref_id += 1usize;
+pub fn set_timeout<F>(f: fn() -> F, millis: u64)
+where
+    F: 'static + Send + Future<Output = ()>,
+{
+    spawn(async move {
+        sleep(millis).await;
+        f().await;
+    });
+}
 
-        id
-    })
+pub fn create_response_channel<T>() -> (oneshot::Sender<T>, oneshot::Receiver<T>) {
+    oneshot::channel::<T>()
 }

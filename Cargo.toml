@@ -1,54 +1,19 @@
 [package]
 name = "r-prime"
-version = "0.1.0"
+version = "0.2.0"
 authors = [
-    "nathan-n-poon <nathannpoon@gmail.com>",
     "raunakab <rabhagat31@gmail.com>",
-    "KelvinKCLee <leekachunkelvin@gmail.com>",
-    "bzhou64 <billzhou64@gmail.com>",
-    "panchalmaharshi8 <panchalmaharshi8@gmail.com>",
+    "nathan-n-poon <nathannpoon@gmail.com>",
 ]
 edition = "2018"
-description = "Asynchronous execution framework for enqueueing async lambdas onto an execution loop"
+description = "Asynchronous execution framework"
 
 [dependencies]
-tokio = { version = "1.4.0", features = [
-    "rt",
-    "net",
-    "io-util",
-    "rt-multi-thread",
-    "sync",
-    "fs",
-    "time"
-] }
-lazy_static = "1.4.0"
+tokio = { version = "1.13.0", features = [ "rt-multi-thread", "time" ] }
+tokio-stream = "0.1.8"
 
 [[example]]
-name = "basic"          # The name of the target.
-test = true             # Is tested by default.
-doctest = false         # Documentation examples are tested by default.
-bench = true            # Is benchmarked by default.
-doc = false             # Is documented by default.
-proc-macro = false      # Set to `true` for a proc-macro library.
-harness = true          # Use libtest harness.
-edition = "2018"        # The edition of the target.
-crate-type = ["bin"]    # The crate types to generate.
-required-features = []  # Features required to build this target (N/A for lib).
-
-[[example]]
-name = "moderate"          # The name of the target.
-test = true             # Is tested by default.
-doctest = false         # Documentation examples are tested by default.
-bench = true            # Is benchmarked by default.
-doc = false             # Is documented by default.
-proc-macro = false      # Set to `true` for a proc-macro library.
-harness = true          # Use libtest harness.
-edition = "2018"        # The edition of the target.
-crate-type = ["bin"]    # The crate types to generate.
-required-features = []  # Features required to build this target (N/A for lib).
-
-[[example]]
-name = "specific"          # The name of the target.
+name = "system1"        # The name of the target.
 test = true             # Is tested by default.
 doctest = false         # Documentation examples are tested by default.
 bench = true            # Is benchmarked by default.
