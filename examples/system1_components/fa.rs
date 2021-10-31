@@ -7,7 +7,7 @@ pub async fn main(_: Txs, mut rx: Receiver<FaMsgs>) -> Result<(), u8> {
         match msg {
             FaMsgs::Ping => println!("got ping"),
         };
-    };
+    }
 
     Ok(())
 }

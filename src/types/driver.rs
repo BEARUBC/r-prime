@@ -16,9 +16,9 @@ where
     Fut: 'static + Future<Output = Result<(), Er>>,
     Er: 'static + Send + Sync,
 {
-    type Type = DriverFn<Con, Fut>;
     type Con = Con;
     type Er = Er;
+    type Type = DriverFn<Con, Fut>;
 
     fn new(f: DriverFn<Con, Fut>) -> Self {
         Self { f }

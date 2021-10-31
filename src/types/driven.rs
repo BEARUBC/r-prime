@@ -23,9 +23,9 @@ where
     Fut: 'static + Future<Output = Result<(), Er>>,
     Er: 'static + Send + Sync,
 {
-    type Type = DrivenFn<Con, Rcv, Fut>;
     type Con = Con;
     type Er = Er;
+    type Type = DrivenFn<Con, Rcv, Fut>;
 
     fn new(f: DrivenFn<Con, Rcv, Fut>) -> Self {
         Self { f, rx: None }
